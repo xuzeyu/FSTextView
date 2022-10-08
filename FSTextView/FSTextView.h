@@ -59,6 +59,16 @@ IB_DESIGNABLE
 @property (nonatomic, strong) UIFont *placeholderFont;
 
 /**
+ placeholder垂直方向边距
+ */
+@property (nonatomic, assign) CGFloat placeholderVerticalMargin;
+
+/**
+ placeholder水平方向边距
+ */
+@property (nonatomic, assign) CGFloat placeholderHorizontalMargin;
+
+/**
  是否允许长按弹出UIMenuController, 默认为YES.
  */
 @property (nonatomic, assign, getter=isCanPerformAction) BOOL canPerformAction;

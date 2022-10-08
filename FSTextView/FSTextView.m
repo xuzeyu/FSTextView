@@ -85,6 +85,9 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
 
 - (void)initialize
 {
+    _placeholderVerticalMargin = kFSTextViewPlaceholderVerticalMargin;
+    _placeholderHorizontalMargin = kFSTextViewPlaceholderHorizontalMargin;
+    
     // 基本配置 (需判断是否在Storyboard中设置了值)
     _canPerformAction = YES;
     
@@ -122,28 +125,88 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
                                                         toItem:self
                                                      attribute:NSLayoutAttributeTop
                                                     multiplier:1.0
-                                                      constant:kFSTextViewPlaceholderVerticalMargin]];
+                                                      constant:self.placeholderVerticalMargin]];
     [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
                                                      attribute:NSLayoutAttributeLeft
                                                      relatedBy:NSLayoutRelationEqual
                                                         toItem:self
                                                      attribute:NSLayoutAttributeLeft
                                                     multiplier:1.0
-                                                      constant:kFSTextViewPlaceholderHorizontalMargin]];
+                                                      constant:self.placeholderHorizontalMargin]];
     [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
                                                      attribute:NSLayoutAttributeWidth
                                                      relatedBy:NSLayoutRelationLessThanOrEqual
                                                         toItem:self
                                                      attribute:NSLayoutAttributeWidth
                                                     multiplier:1.0
-                                                      constant:-kFSTextViewPlaceholderHorizontalMargin*2]];
+                                                      constant:-self.placeholderHorizontalMargin*2]];
     [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
                                                      attribute:NSLayoutAttributeHeight
                                                      relatedBy:NSLayoutRelationLessThanOrEqual
                                                         toItem:self
                                                      attribute:NSLayoutAttributeHeight
                                                     multiplier:1.0
-                                                      constant:-kFSTextViewPlaceholderVerticalMargin*2]];
+                                                      constant:-self.placeholderVerticalMargin*2]];
+}
+
+- (void)setPlaceholderVerticalMargin:(CGFloat)placeholderVerticalMargin {
+    _placeholderVerticalMargin = placeholderVerticalMargin;
+    
+    if (!self.placeholderLabel) {
+        return;
+    }
+    
+    NSArray *constraints = self.constraints;
+    for (NSLayoutConstraint *constraint in constraints) {
+        if (constraint.firstItem == self.placeholderLabel && (constraint.firstAttribute == NSLayoutAttributeTop || constraint.firstAttribute == NSLayoutAttributeHeight)) {
+            [self removeConstraint:constraint];
+        }
+    }
+    
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+                                                     attribute:NSLayoutAttributeTop
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:self
+                                                     attribute:NSLayoutAttributeTop
+                                                    multiplier:1.0
+                                                      constant:self.placeholderVerticalMargin]];
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+                                                     attribute:NSLayoutAttributeHeight
+                                                     relatedBy:NSLayoutRelationLessThanOrEqual
+                                                        toItem:self
+                                                     attribute:NSLayoutAttributeHeight
+                                                    multiplier:1.0
+                                                      constant:-self.placeholderVerticalMargin*2]];
+}
+
+- (void)setPlaceholderHorizontalMargin:(CGFloat)placeholderHorizontalMargin {
+    _placeholderHorizontalMargin = placeholderHorizontalMargin;
+    
+    if (!self.placeholderLabel) {
+        return;
+    }
+    
+    NSArray *constraints = self.constraints;
+    for (NSLayoutConstraint *constraint in constraints) {
+        if (constraint.firstItem == self.placeholderLabel && (constraint.firstAttribute == NSLayoutAttributeLeft || constraint.firstAttribute == NSLayoutAttributeWidth)) {
+            [self removeConstraint:constraint];
+        }
+    }
+    
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+                                                     attribute:NSLayoutAttributeLeft
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:self
+                                                     attribute:NSLayoutAttributeLeft
+                                                    multiplier:1.0
+                                                      constant:self.placeholderHorizontalMargin]];
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+                                                     attribute:NSLayoutAttributeWidth
+                                                     relatedBy:NSLayoutRelationLessThanOrEqual
+                                                        toItem:self
+                                                     attribute:NSLayoutAttributeWidth
+                                                    multiplier:1.0
+                                                      constant:-self.placeholderHorizontalMargin*2]];
 }
 
 #pragma mark - Getter
