@@ -10,13 +10,34 @@ pod 'FSTextView', :git => 'https://github.com/xuzeyu/FSTextView.git'
 
 ## 增加内容
 ```objc
-@property (nonatomic, assign) CGFloat placeholderVerticalMargin; //placeholder垂直方向边距
+/**
+ placeholder垂直方向边距
+ */
+@property (nonatomic, assign) CGFloat placeholderVerticalMargin;
 
-@property (nonatomic, assign) CGFloat placeholderHorizontalMargin; // placeholder水平方向边距
+/**
+ placeholder水平方向边距
+ */
+@property (nonatomic, assign) CGFloat placeholderHorizontalMargin;
+
+/**
+ UITextView的text和placeholder四边间距
+ */
+@property (nonatomic, assign) IBInspectable UIEdgeInsets fs_textContainerInset;
+
+/**
+ 设定文本开始编辑Block回调. (切记弱化引用, 以免造成内存泄露.)
+ */
+- (void)addTextDidBeginEditingHandler:(FSTextViewHandler)beginEditingHandler;
+
+/**
+ 设定文本结束编辑Block回调. (切记弱化引用, 以免造成内存泄露.)
+ */
+- (void)addTextDidEndEditingHandler:(FSTextViewHandler)endEditingHandler;
 ```
 
 ## 最低版本要求
 iOS 6.0 +, Xcode 7.0 +
 
 ## 版本
-1.8.1 增加属性placeholderVerticalMargin和placeholderHorizontalMargin
+1.8.1 增加属性placeholderVerticalMargin，placeholderHorizontalMargin，fs_textContainerInset参数，增加addTextDidBeginEditingHandler和addTextDidEndEditingHandler方法监听

@@ -6,7 +6,9 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
 
 @interface FSTextView ()
 
+@property (nonatomic, copy) FSTextViewHandler beginEditingHandler; ///< 文本开始编辑Block
 @property (nonatomic, copy) FSTextViewHandler changeHandler; ///< 文本改变Block
+@property (nonatomic, copy) FSTextViewHandler endEditingHandler; ///< 文本结束编辑Block
 @property (nonatomic, copy) FSTextViewHandler maxHandler; ///< 达到最大限制字符数Block
 @property (nonatomic, strong) UILabel *placeholderLabel; ///< placeholderLabel
 
@@ -48,10 +50,12 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
 
 - (BOOL)becomeFirstResponder
 {
-    BOOL become = [super becomeFirstResponder];
-    
     // 成为第一响应者时注册通知监听文本变化
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textDidBeginEditing:) name:UITextViewTextDidBeginEditingNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textDidChange:) name:UITextViewTextDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textDidEndEditing:) name:UITextViewTextDidEndEditingNotification object:nil];
+    
+    BOOL become = [super becomeFirstResponder];
     
     return become;
 }
@@ -61,7 +65,9 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
     BOOL resign = [super resignFirstResponder];
     
     // 注销第一响应者时移除文本变化的通知, 以免影响其它的`UITextView`对象.
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextViewTextDidBeginEditingNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextViewTextDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextViewTextDidEndEditingNotification object:nil];
     
     return resign;
 }
@@ -209,6 +215,46 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
                                                       constant:-self.placeholderHorizontalMargin*2]];
 }
 
+- (void)setFs_textContainerInset:(UIEdgeInsets)fs_textContainerInset {
+    _fs_textContainerInset = fs_textContainerInset;
+    [self setTextContainerInset:UIEdgeInsetsMake(fs_textContainerInset.top, fs_textContainerInset.left - kFSTextViewPlaceholderHorizontalMargin, fs_textContainerInset.bottom, fs_textContainerInset.right)];
+    self.layoutManager.allowsNonContiguousLayout = NO;
+    [self.placeholderLabel removeConstraints:self.placeholderLabel.constraints];
+    for (NSLayoutConstraint *constraint in self.placeholderLabel.superview.constraints) {
+        if ([constraint.firstItem isEqual:self.placeholderLabel] || [constraint.secondItem isEqual:self.placeholderLabel]) {
+            [self.placeholderLabel.superview removeConstraint:constraint];
+        }
+    }
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+                                                     attribute:NSLayoutAttributeTop
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:self
+                                                     attribute:NSLayoutAttributeTop
+                                                    multiplier:1.0
+                                                      constant:fs_textContainerInset.top]];
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+                                                     attribute:NSLayoutAttributeLeft
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:self
+                                                     attribute:NSLayoutAttributeLeft
+                                                    multiplier:1.0
+                                                      constant:fs_textContainerInset.left]];
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+                                                     attribute:NSLayoutAttributeWidth
+                                                     relatedBy:NSLayoutRelationLessThanOrEqual
+                                                        toItem:self
+                                                     attribute:NSLayoutAttributeWidth
+                                                    multiplier:1.0
+                                                      constant:- fs_textContainerInset.left - fs_textContainerInset.right]];
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+                                                     attribute:NSLayoutAttributeBottom
+                                                     relatedBy:NSLayoutRelationLessThanOrEqual
+                                                        toItem:self
+                                                     attribute:NSLayoutAttributeBottom
+                                                    multiplier:1.0
+                                                      constant:- fs_textContainerInset.top - fs_textContainerInset.bottom]];
+}
+
 #pragma mark - Getter
 /// 返回一个经过处理的 `self.text` 的值, 去除了首位的空格和换行.
 - (NSString *)formatText
@@ -304,6 +350,10 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
 }
 
 #pragma mark - NSNotification
+- (void)textDidBeginEditing:(NSNotification *)notification {
+    !_beginEditingHandler ?: _beginEditingHandler(self);
+}
+
 - (void)textDidChange:(NSNotification *)notification
 {
     // 通知回调的实例的不是当前实例的话直接返回
@@ -336,6 +386,10 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
     !_changeHandler ?: _changeHandler(self);
 }
 
+- (void)textDidEndEditing:(NSNotification *)notification {
+    !_endEditingHandler ?: _endEditingHandler(self);
+}
+
 #pragma mark - Public
 
 + (instancetype)textView
@@ -343,9 +397,19 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
     return [[self alloc] init];
 }
 
+- (void)addTextDidBeginEditingHandler:(FSTextViewHandler)beginEditingHandler
+{
+    _beginEditingHandler = [beginEditingHandler copy];
+}
+
 - (void)addTextDidChangeHandler:(FSTextViewHandler)changeHandler
 {
     _changeHandler = [changeHandler copy];
+}
+
+- (void)addTextDidEndEditingHandler:(FSTextViewHandler)endEditingHandler
+{
+    _endEditingHandler = [endEditingHandler copy];
 }
 
 - (void)addTextLengthDidMaxHandler:(FSTextViewHandler)maxHandler

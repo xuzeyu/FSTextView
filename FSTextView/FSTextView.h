@@ -14,9 +14,19 @@ IB_DESIGNABLE
 + (instancetype)textView;
 
 /**
+ 设定文本开始编辑Block回调. (切记弱化引用, 以免造成内存泄露.)
+ */
+- (void)addTextDidBeginEditingHandler:(FSTextViewHandler)beginEditingHandler;
+
+/**
  设定文本改变Block回调. (切记弱化引用, 以免造成内存泄露.)
  */
 - (void)addTextDidChangeHandler:(FSTextViewHandler)eventHandler;
+
+/**
+ 设定文本结束编辑Block回调. (切记弱化引用, 以免造成内存泄露.)
+ */
+- (void)addTextDidEndEditingHandler:(FSTextViewHandler)endEditingHandler;
 
 /**
  设定达到最大长度Block回调. (切记弱化引用, 以免造成内存泄露.)
@@ -69,6 +79,11 @@ IB_DESIGNABLE
 @property (nonatomic, assign) CGFloat placeholderHorizontalMargin;
 
 /**
+ UITextView的text和placeholder四边间距
+ */
+@property (nonatomic, assign) IBInspectable UIEdgeInsets fs_textContainerInset;
+
+/**
  是否允许长按弹出UIMenuController, 默认为YES.
  */
 @property (nonatomic, assign, getter=isCanPerformAction) BOOL canPerformAction;
@@ -77,5 +92,6 @@ IB_DESIGNABLE
  该属性返回一个经过处理的 `self.text` 的值, 去除了首位的空格和换行.
  */
 @property (nonatomic, readonly) NSString *formatText;
+
 
 @end
