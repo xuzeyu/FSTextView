@@ -84,6 +84,11 @@ IB_DESIGNABLE
 @property (nonatomic, assign) IBInspectable UIEdgeInsets fs_textContainerInset;
 
 /**
+  是否禁止换行
+ */
+@property (nonatomic, assign) BOOL disableNewline;
+
+/**
  是否允许长按弹出UIMenuController, 默认为YES.
  */
 @property (nonatomic, assign, getter=isCanPerformAction) BOOL canPerformAction;

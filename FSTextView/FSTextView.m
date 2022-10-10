@@ -371,6 +371,10 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
         }
     }
     
+    if (self.disableNewline && [self.text containsString:@"\n"]) {
+        self.text = [self.text stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    }
+    
     // 只有当maxLength字段的值不为无穷大整型也不为0时才计算限制字符数.
     if (_maxLength != NSUIntegerMax && _maxLength != 0 && self.text.length > 0) {
         

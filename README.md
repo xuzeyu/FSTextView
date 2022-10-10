@@ -24,6 +24,10 @@ pod 'FSTextView', :git => 'https://github.com/xuzeyu/FSTextView.git'
  UITextView的text和placeholder四边间距
  */
 @property (nonatomic, assign) IBInspectable UIEdgeInsets fs_textContainerInset;
+/**
+  是否禁止换行
+ */
+@property (nonatomic, assign) BOOL disableNewline;
 
 /**
  设定文本开始编辑Block回调. (切记弱化引用, 以免造成内存泄露.)
@@ -40,4 +44,4 @@ pod 'FSTextView', :git => 'https://github.com/xuzeyu/FSTextView.git'
 iOS 6.0 +, Xcode 7.0 +
 
 ## 版本
-1.8.1 增加属性placeholderVerticalMargin，placeholderHorizontalMargin，fs_textContainerInset参数，增加addTextDidBeginEditingHandler和addTextDidEndEditingHandler方法监听
+1.8.1 增加属性placeholderVerticalMargin，placeholderHorizontalMargin，fs_textContainerInset,disableNewline参数，增加addTextDidBeginEditingHandler和addTextDidEndEditingHandler方法监听
