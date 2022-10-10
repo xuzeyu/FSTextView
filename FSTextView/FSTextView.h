@@ -89,6 +89,11 @@ IB_DESIGNABLE
 @property (nonatomic, assign) BOOL disableNewline;
 
 /**
+  是否点击Return按钮自动取消编辑状态
+ */
+@property (nonatomic, assign) BOOL isResignFirstResponderAfterReturn;
+
+/**
  是否允许长按弹出UIMenuController, 默认为YES.
  */
 @property (nonatomic, assign, getter=isCanPerformAction) BOOL canPerformAction;

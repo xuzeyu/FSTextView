@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 	s.name = "FSTextView"
-	s.version = "1.8"
+	s.version = "1.8.1"
 	s.summary = "Subclass of UITextView with Placeholder."
 	s.license = { :type => "MIT", :file => "LICENSE" }
 	s.homepage = "https://github.com/xuzeyu/FSTextView"

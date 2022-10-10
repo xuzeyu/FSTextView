@@ -371,8 +371,14 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
         }
     }
     
-    if (self.disableNewline && [self.text containsString:@"\n"]) {
-        self.text = [self.text stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    if ([self.text containsString:@"\n"]) {
+        if (self.disableNewline) {
+            self.text = [self.text stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        }
+        
+        if (self.isResignFirstResponderAfterReturn) {
+            [self resignFirstResponder];
+        }
     }
     
     // 只有当maxLength字段的值不为无穷大整型也不为0时才计算限制字符数.
