@@ -12,6 +12,7 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
 @property (nonatomic, copy) FSTextViewHandler maxHandler; ///< 达到最大限制字符数Block
 @property (nonatomic, strong) UILabel *placeholderLabel; ///< placeholderLabel
 
+@property (nonatomic, strong) NSMutableArray *placeholderLabelConstraints; ///<placeholderLabel的约束
 @end
 
 @implementation FSTextView
@@ -125,34 +126,36 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
     [self addSubview:self.placeholderLabel];
     
     // constraint
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+    self.placeholderLabelConstraints = [NSMutableArray array];
+    [self.placeholderLabelConstraints addObject:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
                                                      attribute:NSLayoutAttributeTop
                                                      relatedBy:NSLayoutRelationEqual
                                                         toItem:self
                                                      attribute:NSLayoutAttributeTop
                                                     multiplier:1.0
                                                       constant:self.placeholderVerticalMargin]];
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+    [self.placeholderLabelConstraints addObject:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
                                                      attribute:NSLayoutAttributeLeft
                                                      relatedBy:NSLayoutRelationEqual
                                                         toItem:self
                                                      attribute:NSLayoutAttributeLeft
                                                     multiplier:1.0
                                                       constant:self.placeholderHorizontalMargin]];
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+    [self.placeholderLabelConstraints addObject:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
                                                      attribute:NSLayoutAttributeWidth
                                                      relatedBy:NSLayoutRelationLessThanOrEqual
                                                         toItem:self
                                                      attribute:NSLayoutAttributeWidth
                                                     multiplier:1.0
                                                       constant:-self.placeholderHorizontalMargin*2]];
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+    [self.placeholderLabelConstraints addObject:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
                                                      attribute:NSLayoutAttributeHeight
                                                      relatedBy:NSLayoutRelationLessThanOrEqual
                                                         toItem:self
                                                      attribute:NSLayoutAttributeHeight
                                                     multiplier:1.0
                                                       constant:-self.placeholderVerticalMargin*2]];
+    [self addConstraints:self.placeholderLabelConstraints];
 }
 
 - (void)setPlaceholderVerticalMargin:(CGFloat)placeholderVerticalMargin {
@@ -162,8 +165,7 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
         return;
     }
     
-    NSArray *constraints = self.constraints;
-    for (NSLayoutConstraint *constraint in constraints) {
+    for (NSLayoutConstraint *constraint in self.placeholderLabelConstraints) {
         if (constraint.firstItem == self.placeholderLabel && (constraint.firstAttribute == NSLayoutAttributeTop || constraint.firstAttribute == NSLayoutAttributeHeight)) {
             [self removeConstraint:constraint];
         }
@@ -191,9 +193,8 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
     if (!self.placeholderLabel) {
         return;
     }
-    
-    NSArray *constraints = self.constraints;
-    for (NSLayoutConstraint *constraint in constraints) {
+ 
+    for (NSLayoutConstraint *constraint in self.placeholderLabelConstraints) {
         if (constraint.firstItem == self.placeholderLabel && (constraint.firstAttribute == NSLayoutAttributeLeft || constraint.firstAttribute == NSLayoutAttributeWidth)) {
             [self removeConstraint:constraint];
         }
@@ -219,40 +220,38 @@ CGFloat const kFSTextViewPlaceholderHorizontalMargin = 6.0; ///< placeholder水�
     _fs_textContainerInset = fs_textContainerInset;
     [self setTextContainerInset:UIEdgeInsetsMake(fs_textContainerInset.top, fs_textContainerInset.left - kFSTextViewPlaceholderHorizontalMargin, fs_textContainerInset.bottom, fs_textContainerInset.right)];
     self.layoutManager.allowsNonContiguousLayout = NO;
-    [self.placeholderLabel removeConstraints:self.placeholderLabel.constraints];
-    for (NSLayoutConstraint *constraint in self.placeholderLabel.superview.constraints) {
-        if ([constraint.firstItem isEqual:self.placeholderLabel] || [constraint.secondItem isEqual:self.placeholderLabel]) {
-            [self.placeholderLabel.superview removeConstraint:constraint];
-        }
-    }
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+    
+    [self removeConstraints:self.placeholderLabelConstraints];
+    [self.placeholderLabelConstraints removeAllObjects];
+    [self.placeholderLabelConstraints addObject:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
                                                      attribute:NSLayoutAttributeTop
                                                      relatedBy:NSLayoutRelationEqual
                                                         toItem:self
                                                      attribute:NSLayoutAttributeTop
                                                     multiplier:1.0
                                                       constant:fs_textContainerInset.top]];
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+    [self.placeholderLabelConstraints addObject:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
                                                      attribute:NSLayoutAttributeLeft
                                                      relatedBy:NSLayoutRelationEqual
                                                         toItem:self
                                                      attribute:NSLayoutAttributeLeft
                                                     multiplier:1.0
                                                       constant:fs_textContainerInset.left]];
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+    [self.placeholderLabelConstraints addObject:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
                                                      attribute:NSLayoutAttributeWidth
                                                      relatedBy:NSLayoutRelationLessThanOrEqual
                                                         toItem:self
                                                      attribute:NSLayoutAttributeWidth
                                                     multiplier:1.0
                                                       constant:- fs_textContainerInset.left - fs_textContainerInset.right]];
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
+    [self.placeholderLabelConstraints addObject:[NSLayoutConstraint constraintWithItem:self.placeholderLabel
                                                      attribute:NSLayoutAttributeBottom
                                                      relatedBy:NSLayoutRelationLessThanOrEqual
                                                         toItem:self
                                                      attribute:NSLayoutAttributeBottom
                                                     multiplier:1.0
                                                       constant:- fs_textContainerInset.top - fs_textContainerInset.bottom]];
+    [self addConstraints:self.placeholderLabelConstraints];
 }
 
 #pragma mark - Getter
